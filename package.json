@@ -3,17 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@wharfkit/session": "^1.2.2",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.2",
+    "@wharfkit/session": "^1.2.5",
     "@wharfkit/transact-plugin-cosigner": "^1.1.0",
-    "@wharfkit/wallet-plugin-anchor": "^1.1.0",
-    "@wharfkit/web-renderer": "^1.1.5",
+    "@wharfkit/wallet-plugin-anchor": "^1.2.0",
+    "@wharfkit/web-renderer": "^1.2.0",
+    "npm-check-updates": "^16.14.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "sass": "^1.70.0"
   },
   "scripts": {
     "start": "react-scripts start",

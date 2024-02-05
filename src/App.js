@@ -1,5 +1,5 @@
 import logo from './logo.png';
-import './App.css';
+import './App.scss';
 import React, { useState, useEffect } from 'react';
 import { SessionKit } from "@wharfkit/session"
 import { TransactPluginCosigner } from "@wharfkit/transact-plugin-cosigner"
@@ -7,6 +7,8 @@ import { WebRenderer } from "@wharfkit/web-renderer"
 import { WalletPluginAnchor } from "@wharfkit/wallet-plugin-anchor"
 import params_min_b64 from './params_mint.b64';
 import init, { js_zsign_transfer_and_mint_transaction } from './pkg_st/zeos_caterpillar.js'
+import MintInputMask from './MintInputMask.js'
+import MintZActionsDisplay from './MintZActionsDisplay.js'
 
 await init();
 
@@ -16,6 +18,19 @@ fetch(params_min_b64).then(r => r.text()).then(text => {
     mint_params_bytes = fromB64String(text)
     //console.log(mint_params_bytes)
 });
+
+var symbols = [
+    {
+        name: "EOS",
+        symbol: "4,EOS",
+        contract: "eosio.token"
+    },
+    {
+        name: "ZEOS",
+        symbol: "4,ZEOS",
+        contract: "thezeostoken"
+    }
+]
 
 const webRenderer = new WebRenderer()
 const sessionKit = new SessionKit({
@@ -65,43 +80,20 @@ async function fetch_fee_table()
     }
     apiNodeIndex = (apiNodeIndex === apiNodes.length-1) ? 0 : apiNodeIndex+1;
 }
+// fetch current fees
+var fee_table = await fetch_fee_table()
+console.log(fee_table)
 
 function App()
 {
     const [session, setSession] = useState(undefined);
-    let desc_json = session ? `[
-    {
-        "to": "za1myffclyc7d5k05q9tpd9kn74el0uljwhfycm0kxnqmpvv5qzcm8wezc70855rlsmlehmwv87k5c",
-        "code": "eosio.token",
-        "quantity": "10.0000 EOS",
-        "memo": "EOS tokens into wallet",
-        "from": "`+session.actor+`",
-        "publish_note": true
-    },
-    {
-        "to": "za1myffclyc7d5k05q9tpd9kn74el0uljwhfycm0kxnqmpvv5qzcm8wezc70855rlsmlehmwv87k5c",
-        "code": "thezeostoken",
-        "quantity": "100.0000 ZEOS",
-        "memo": "miau miau",
-        "from": "`+session.actor+`",
-        "publish_note": true
-    },
-    {
-        "to": "za1myffclyc7d5k05q9tpd9kn74el0uljwhfycm0kxnqmpvv5qzcm8wezc70855rlsmlehmwv87k5c",
-        "code": "atomicassets",
-        "quantity": "1234567898765432",
-        "memo": "This is my address: $SELF and this was the auth token: $AUTH0",
-        "from": "`+session.actor+`",
-        "publish_note": true
-    }
-]` : ""
+    const [mintZActions, setMintZActions] = useState([]);
     async function transact()
     {
-        // fetch current fees
-        let fee_table = await fetch_fee_table()
+        //let fee_table = await fetch_fee_table()
         console.log(fee_table)
         let tx_json = js_zsign_transfer_and_mint_transaction(
-            desc_json,
+            JSON.stringify(mintZActions),
             "thezeosalias@public",
             String(session.actor) + "@active",
             "zeos4privacy",
@@ -148,20 +140,42 @@ function App()
         },
         []  // empty dependency array => effect will only execute once
     )
+    function addMintDesc(desc)
+    {
+        setMintZActions([...mintZActions, desc])
+    }
+    function rmMintDesc(index)
+    {
+        mintZActions.splice(index, 1)
+        setMintZActions([...mintZActions])
+    }
+    function clearTx()
+    {
+        setMintZActions([])
+    }
 
     return (
         <div className="App">
             <div className="App-header">
                 <img src={logo} className="App-logo" alt="logo" />
+                <div id='app-info'>
+                    <h1>ZEOS Bridge</h1>
+                    <div>Transfer Assets into the Shielded Protocol</div>
+                </div>
+                {session ? (
+                    <div className='column' id="user-info">
+                        <label htmlFor="logout-button">Welcome, {String(session.actor)}</label>
+                        <button id="logout-button" onClick={logout}>Logout</button>
+                    </div>
+                ) : (<></>)}
             </div>
             <div className="App-body">
                 {session ? (
                     <div className='column'>
-                        <h1>Welcome, {String(session.actor)}</h1>
-                        <button onClick={logout}>Logout</button>
-                        <textarea cols={100} rows={30} onChange={e => desc_json = e.target.value} defaultValue={desc_json}>
-                        </textarea>
-                        <button onClick={transact}>Transact</button>
+                        <div className='row'>
+                            <MintInputMask user={String(session.actor)} symbols={symbols} addMintDesc={addMintDesc} />
+                            <MintZActionsDisplay zactions={mintZActions} execute={transact} rmDesc={rmMintDesc} clearTx={clearTx} fees={fee_table.fees} />
+                        </div>
                     </div>
                 ) : (
                     <button onClick={login}>Login</button>

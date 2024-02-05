@@ -1,0 +1,46 @@
+
+.transaction {
+    border: 1px solid #2a82da;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 0px #2a82da;
+    padding-bottom: 30px;
+    margin: 20px;
+    width: 630px;
+}
+
+.action {
+    padding: 10px;
+    margin: 10px;
+    text-align: left;
+    width: 580px;
+    background-color: #2a2a2a;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    button {
+        margin: 0 auto;
+    }
+
+    .data
+    {
+        font-family: 'Courier New', Courier, monospace;
+    }
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
