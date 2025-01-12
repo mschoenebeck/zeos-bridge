@@ -11,7 +11,8 @@ import { Signature as AnchorSignature, SignedTransaction } from "@wharfkit/antel
 import { Api, JsonRpc } from 'eosjs';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';
 import { PrivateKey, PublicKey, Signature } from 'eosjs/dist/eosjs-key-conversions';
-import params_min_b64 from './params_mint.b64';
+//import params_min_b64 from './params_mint.b64';
+import params_min_b64 from './mint.params.b64';
 import init, { js_zsign_transfer_and_mint_transaction } from './pkg_st/zeos_caterpillar.js';
 import MintInputMask from './MintInputMask.js';
 import MintZActionsDisplay from './MintZActionsDisplay.js';
@@ -28,13 +29,13 @@ fetch(params_min_b64).then(r => r.text()).then(text => {
 
 var symbols = [
     {
-        name: "EOS",
-        symbol: "4,EOS",
+        name: "UOS",
+        symbol: "8,UOS",
         contract: "eosio.token"
     },
     {
-        name: "ZEOS",
-        symbol: "4,ZEOS",
+        name: "CLOAK",
+        symbol: "4,CLOAK",
         contract: "thezeostoken"
     },
     {
@@ -179,7 +180,6 @@ function App()
             {
                 //setSession(await sessionKit.restore());
                 setSession(await link.restoreSession('mydapp'));
-                console.log(PrivateKey.fromString('5KFqPVuc9BbnWtYbFFKK339z4oQ68RAZXfwB6SwoBJH2DnfUX3D').toString());
             }
             restore();
         },
