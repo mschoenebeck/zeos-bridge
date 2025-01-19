@@ -1,0 +1,48 @@
+{
+  "name": "zeos-bridge-ui",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.2",
+    "@wharfkit/session": "^1.2.5",
+    "@wharfkit/transact-plugin-cosigner": "^1.1.0",
+    "@wharfkit/wallet-plugin-anchor": "^1.2.0",
+    "@wharfkit/web-renderer": "^1.2.0",
+    "anchor-link": "^3.6.0",
+    "anchor-link-browser-transport": "^3.6.1",
+    "base58": "^2.0.1",
+    "buffer": "^6.0.3",
+    "eosjs": "^22.1.0",
+    "npm-check-updates": "^16.14.12",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "sass": "^1.70.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

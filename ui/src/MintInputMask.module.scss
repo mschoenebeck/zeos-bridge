@@ -1,0 +1,60 @@
+
+.container {
+    border: 1px solid #2a82da;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 0px #2a82da;
+    margin: 20px;
+    padding: 0 10px 30px 10px;
+    width: 400px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    //align-items: center;
+    //justify-content: center;
+    gap: 10px;
+    text-align: left;
+
+    //border: 2px solid #2a82da;
+    //border-radius: 10px;
+    padding: 10px;
+    //margin: 10px;
+    //width: 400px;
+
+    textarea {
+        width: 100%;
+        background-color: #2a2a2a;
+        color: white;
+    }
+    input {
+        width: 100%;
+        background-color: #2a2a2a;
+        color: white;
+    }
+    // strange hack to avoid dark colors to disappear on auto-fill (https://stackoverflow.com/a/63589498/2340535)
+    input:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px #2a2a2a inset;
+        color-scheme: dark;
+    }
+    select {
+        width: 100%;
+        background-color: #2a2a2a;
+        color: white;
+    }
+    label {
+        text-align: left;
+        //font-size: 12px;
+    }
+    button {
+        width: fit-content;
+    }
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
