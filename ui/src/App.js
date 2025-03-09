@@ -23,6 +23,7 @@ const TOKEN_CONTRACTS = [
     "eosio.token",
     CLOAK_TOKEN_CONTRACT
 ];
+const UNIQ_TOKEN_CONTRACT = "eosio.nft.ft";
 
 //const webRenderer = new WebRenderer();
 //const sessionKit = new SessionKit({
@@ -154,12 +155,11 @@ async function fetchBalances(account)
     {
         try
         {
-            // fetch info from chain
             const response = await fetchChainApiJson('/v1/chain/get_table_rows', {
                 code: contract,
                 table: 'accounts',
                 scope: account,
-                limit: 100,
+                limit: 100, // TODO: pagination
                 json: true
             });
             if(Object.hasOwn(response, 'error'))
@@ -177,7 +177,7 @@ async function fetchBalances(account)
                     contract,
                     balance: row.balance
                 };
-            }))
+            }));
         }
         catch(err)
         {
@@ -188,10 +188,38 @@ async function fetchBalances(account)
     return balances;
 }
 
+async function fetchUniqs(account)
+{
+    let uniqs = [];
+    try
+    {
+        const response = await fetchChainApiJson('/v1/chain/get_table_rows', {
+            code: UNIQ_TOKEN_CONTRACT,
+            table: 'token.b',
+            scope: account,
+            limit: 100, // TODO: pagination
+            json: true
+        });
+        if(Object.hasOwn(response, 'error'))
+        {
+            console.log(response);
+            return null; // TODO: should throw
+        }
+        uniqs = uniqs.concat(response.rows);
+    }
+    catch(err)
+    {
+        console.log(err.message);
+        throw err.message;
+    }
+    return uniqs;
+}
+
 function App()
 {
     const [session, setSession] = useState(null);
     const [balances, setBalances] = useState([]);
+    const [uniqs, setUniqs] = useState([]);
     const [mintZActions, setMintZActions] = useState([]);
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const workerRef = useRef(null);
@@ -208,39 +236,77 @@ function App()
             withdraw: "0.0000 CLOAK"
         }
     });
-
     const addressRef = useRef(null);
     const symbolRef = useRef(null);
     const amountRef = useRef(null);
     const memoRef = useRef(null);
+    const [isNFTToggled, setIsNFTToggled] = useState(false);
+    const handleNFTToggle = () => {
+        setIsNFTToggled((prev) => !prev);
+    };
 
-    function verifyAdd(desc)
+    function verifyAdd()
     {
         // address validity checks
-        if(desc.to.length !== 78)
+        if(addressRef.current.value.length !== 78)
         {
             alert("address length must be 78")
             return
         }
-        if(desc.to.substr(0, 3) !== "za1")
+        if(addressRef.current.value.substr(0, 3) !== "za1")
         {
             alert("address must start with 'za1'")
             return
         }
-        if(!/^[qpzry9x8gf2tvdw0s3jn54khce6mua7l]*$/.test(desc.to.substr(3)))
+        if(!/^[qpzry9x8gf2tvdw0s3jn54khce6mua7l]*$/.test(addressRef.current.value.substr(3)))
         {
             alert("address contains invalid characters")
             return
         }
 
-        // amount validity check
-        if(desc.quantity === "")
+        if(isNFTToggled)
         {
-            alert("invalid amount")
-            return
+            // uniq ID validity check
+            if(symbolRef.current.value === "")
+            {
+                alert("invalid uniq ID")
+                return
+            }
+        }
+        else
+        {
+            // amount validity check
+            if(amountRef.current.value === "")
+            {
+                alert("invalid amount")
+                return
+            }
         }
 
-        desc.quantity = Asset.fromFloat(parseFloat(desc.quantity), Asset.Symbol.from(balances[symbolRef.current.value].symbol)).toString();
+        let desc;
+        if(isNFTToggled)
+        {
+            desc = {
+                to: addressRef.current.value,
+                contract: UNIQ_TOKEN_CONTRACT,
+                quantity: String(uniqs[symbolRef.current.value].id),
+                memo: memoRef.current.value,
+                from: /*String(session.auth.actor)*/session[0],
+                publish_note: true
+            };
+        }
+        else
+        {
+            desc = {
+                to: addressRef.current.value,
+                contract: balances[symbolRef.current.value].contract,
+                quantity: Asset.fromFloat(parseFloat(amountRef.current.value), Asset.Symbol.from(balances[symbolRef.current.value].symbol)).toString(),
+                memo: memoRef.current.value,
+                from: /*String(session.auth.actor)*/session[0],
+                publish_note: true
+            };
+        }
+console.log(desc);
         setMintZActions([...mintZActions, desc]);
     }
 
@@ -347,8 +413,16 @@ function App()
     }, []);
 
     useEffect(() => {
-        if(session) fetchBalances(session[0]).then(bals => setBalances(bals));
-        else setBalances([]);
+        if(session)
+        {
+            fetchBalances(session[0]).then(bals => setBalances(bals));
+            fetchUniqs(session[0]).then(unqs => setUniqs(unqs));
+        }
+        else
+        {
+            setBalances([]);
+            setUniqs([]);
+        }
     }, [session]);
 
     async function transact()
@@ -421,9 +495,18 @@ function App()
                 const transformedObj = Object.fromEntries(
                     Object.entries(obj).map(([key, value]) => [keyMap[key] || key, value])
                 );
-                // Transform the 'authorizations' array if it exists
-                if (transformedObj.authorizations) {
-                    transformedObj.authorizations = transformedObj.authorizations.map(auth => `${auth.actor}@${auth.permission}`);
+                // transform the 'authorizations' array if it exists
+                if(transformedObj.authorizations) transformedObj.authorizations = transformedObj.authorizations.map(auth => `${auth.actor}@${auth.permission}`);
+                // transform NFT transfer actions to uniq NFT contract
+                if(transformedObj.contract === "eosio.nft.ft")
+                {
+                    transformedObj.data.token_ids = transformedObj.data.asset_ids.map(id => parseInt(id));
+                    delete transformedObj.data.asset_ids;
+                    transformedObj.data.transfer = structuredClone(transformedObj.data);
+                    delete transformedObj.data.from;
+                    delete transformedObj.data.to;
+                    delete transformedObj.data.memo;
+                    delete transformedObj.data.token_ids;
                 }
                 return transformedObj;
             });
@@ -454,6 +537,7 @@ function App()
 
             // update balances
             fetchBalances(session[0]).then(bals => setBalances(bals));
+            fetchUniqs(session[0]).then(unqs => setUniqs(unqs));
         };
     }
 
@@ -484,30 +568,39 @@ function App()
                                     <input type="text" id="address-input" name="address" ref={addressRef} />
                                 </div>
                                 <div>
-                                    <label htmlFor="symbol-select">Symbol:</label>
+                                    <label className="d-flex justify-content-between w-100" htmlFor="symbol-select">
+                                        {isNFTToggled ? <span>uniq ID:</span> : <span>Symbol:</span>}
+                                        <div className="d-flex align-items-center gap-1">
+                                            <span>FT</span>
+                                            <label className="switch">
+                                                <input type="checkbox" checked={isNFTToggled} onChange={handleNFTToggle} />
+                                                <span className="slider round"></span>
+                                            </label>
+                                            <span>NFT</span>
+                                        </div>
+                                    </label>
                                     <select name="symbol" id="symbol-select" ref={symbolRef}>
-                                        {balances && balances.map((bal, i) => (<option key={i} value={i}>{bal.balance + '@' + bal.contract}</option>))}
+                                        {isNFTToggled ?
+                                            uniqs && uniqs.map((uniq, i) => (<option key={i} value={i}>{uniq.id + '@' + UNIQ_TOKEN_CONTRACT}</option>))
+                                        :
+                                            balances && balances.map((bal, i) => (<option key={i} value={i}>{bal.balance + '@' + bal.contract}</option>))
+                                        }
                                     </select>
                                 </div>
-                                <div>
-                                    <label htmlFor="amount-input">Amount:</label>
-                                    <input type="number" id="amount-input" name="amount" ref={amountRef} />
-                                </div>
+                                {isNFTToggled ? <></> :
+                                    <div>
+                                        <label htmlFor="amount-input">Amount:</label>
+                                        <input type="number" id="amount-input" name="amount" ref={amountRef} />
+                                    </div>
+                                }
                                 <div>
                                     <label htmlFor="memo-input">Private Memo:</label>
                                     <textarea id="memo-input" name="memo" rows="10" ref={memoRef} />
                                 </div>
                             </div>
                             <div className="d-flex align-items-center justify-content-center gap-2">
-                                <button className='btn-l' disabled={buttonDisabled} onClick={() => clear()}>Clear</button>
-                                <button className='btn-l' disabled={buttonDisabled} onClick={() => verifyAdd({
-                                    to: addressRef.current.value,
-                                    contract: balances[symbolRef.current.value].contract,
-                                    quantity: amountRef.current.value,
-                                    memo: memoRef.current.value,
-                                    from: /*String(session.auth.actor)*/session[0],
-                                    publish_note: true
-                                })}>Add</button>
+                                <button className='btn-l' disabled={buttonDisabled} onClick={clear}>Clear</button>
+                                <button className='btn-l' disabled={buttonDisabled} onClick={verifyAdd}>Add</button>
                             </div>
                         </div>
                     </div>
