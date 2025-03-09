@@ -1,0 +1,241 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url('fonts/Poppins ExtraLight.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Serpentine';
+    src: url('fonts/Serpentine BoldItalic.ttf') format('truetype');
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+h1, h2, h3 {
+    font-family: 'Serpentine';
+}
+
+.btn-default {
+    background-image: linear-gradient(to bottom, #4e4e4e 0%, #424242  100%);
+    border-color: #646464;
+    border: 1px solid #575757;
+    border-radius: 3px;
+    color: #fff;
+}
+
+.btn-l {
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: 'Serpentine';
+    font-size: 16px;
+    height: 51px;
+    border-radius: 25px;
+    padding: 10px 25px;
+    /*border: 1px solid #ffffff;*/
+    box-shadow: 0 0 30px 0px #ffffff;
+}
+.btn-l:hover {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #ffffff;
+}
+.btn-l:active {
+    background-color: #FFFFFF;
+}
+
+.App {
+    text-align: center;
+}
+
+.App-logo {
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+}
+
+.App-header {
+    /*background-color: rgba(80, 80, 80, 0.5);*/
+    background-color: #232323;
+    height: 4vh;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: white;
+    padding: 0 10px 0 10px;
+}
+
+#user-info {
+    /*margin-left: auto;*/
+    padding-right: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    height: 100%;
+}
+
+#app-info {
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.App-body {
+    padding: 3vh;
+    margin: 4vh;
+    min-height: 92vh;
+    width: 90vw;
+    color: white;
+}
+
+
+.fullscreen-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh; /* Ensure it covers the full viewport height */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+    background: url('../background_1.png') center/cover no-repeat, rgba(80, 80, 80, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.mim-container {
+    background-color: rgba(80, 80, 80, 0.5);
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 0px #ffffff;
+}
+
+textarea {
+    width: 100%;
+    /*background-color: #2a2a2a;*/
+    background-color: rgba(80, 80, 80, 0.0);
+    color: white;
+    border-radius: 5px;
+}
+textarea:focus {
+    outline: none;
+
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 5px 0px #ffffff;
+}
+input {
+    width: 100%;
+    background-color: rgba(80, 80, 80, 0.0) !important;
+    color: white;
+    border-radius: 5px;
+}
+input:focus {
+    outline: none;
+
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 5px 0px #ffffff;
+}
+/* strange hack to avoid dark colors to disappear on auto-fill (https://stackoverflow.com/a/63589498/2340535)*/
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px rgba(80, 80, 80, 0.0) inset;
+    color-scheme: dark;
+}
+select {
+    width: 100%;
+    background-color: rgba(80, 80, 80, 0.0);
+    color: white;
+    border-radius: 5px;
+}
+select option {
+    background-color: rgba(80, 80, 80, 0.5); /* Background color for dropdown options */
+    color: white;
+    border-radius: 5px;
+}
+select:focus {
+    outline: none;
+
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 5px 0px #ffffff;
+}
+label {
+    text-align: left;
+}
+button {
+    width: fit-content;
+}
+
+
+.transaction {
+    background-color: rgba(80, 80, 80, 0.5);
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 0px #ffffff;
+    padding-bottom: 30px;
+    margin: 20px;
+    width: 630px;
+}
+.action {
+    padding: 10px;
+    text-align: left;
+    width: 200px;
+    background-color: rgba(80, 80, 80, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.action button {
+    margin: 0 auto;
+}
+.action .data {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+
+.flexbox-row {
+    display: flex;
+    align-items: stretch; /* Ensures children stretch to match container height */
+    justify-content: start;
+    background: transparent; /* Transparent background for the overall container */
+    overflow: visible;
+}
+.trail {
+    flex: 1;
+    background-color: rgba(80, 80, 80, 0.5); /* Consistent color for the trail */
+    display: flex;
+    align-items: center;
+    padding: 10px 20px; /* Add padding for inner spacing */
+    color: white;
+}
+.chevron {
+    position: relative;
+    width: 100px; /* Adjust width of the chevron */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}  
+.chevron::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0; /* Aligns with the top of the container */
+    width: 100%;
+    height: 100%; /* Matches the parent container's dynamic height */
+    background-color: rgba(80, 80, 80, 0.5); /* Same color as the trail */
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
